@@ -3,6 +3,8 @@ import sqlite3
 import mysql.connector
 import os
 from fastapi.responses import FileResponse
+from PIL import Image
+from io import BytesIO
 
 
 app = FastAPI()
@@ -72,11 +74,44 @@ def get_request_times():
 # Путь к папке с изображениями
 IMAGE_DIRECTORY = "/root/tarkov_api/maps/WoodsMap"
 
-@app.get("/images/{image_name}")
-async def get_image(image_name: str):
-    image_path = os.path.join(IMAGE_DIRECTORY, image_name)
-    if os.path.exists(image_path):
-        return FileResponse(image_path)
-    else:
-        return {"message": "Изображение не найдено"}
+def combine_images(map_image_name, filter_names):
+    """
+    Объединяет карту и фильтры в одно изображение.
 
+    Args:
+        map_image_name: Имя файла карты (например, "карта.png").
+        filter_names: Список имен файлов фильтров (например, ["фильтр1.png", "фильтр2.png"]).
+
+    Returns:
+        BytesIO: Объединенное изображение в формате BytesIO.
+    """
+    map_image_path = os.path.join(IMAGE_DIRECTORY, map_image_name)
+    map_image = Image.open(map_image_path).convert("RGBA")
+
+    for filter_name in filter_names:
+        filter_path = os.path.join(IMAGE_DIRECTORY, filter_name)
+        if os.path.exists(filter_path):
+            filter_image = Image.open(filter_path).convert("RGBA")
+            map_image.paste(filter_image, (0, 0), filter_image)
+
+    # Сохраняем объединенное изображение в BytesIO
+    output = BytesIO()
+    map_image.save(output, format="PNG")
+    output.seek(0)
+    return output
+
+@app.get("/images/{map_image_name}/filters/{filter_names}")
+async def get_image_with_filters(map_image_name: str, filter_names: str):
+    """
+    Возвращает объединенное изображение карты с наложенными фильтрами.
+
+    Args:
+        map_image_name: Имя файла карты.
+        filter_names: Список имен файлов фильтров, разделенных запятыми.
+
+    Returns:
+        FileResponse: Объединенное изображение в формате PNG.
+    """
+    filter_list = filter_names.split(",")
+    combined_image = combine_images(map_image_name, filter_list)
+    return FileResponse(combined_image, media_type="image/png")
