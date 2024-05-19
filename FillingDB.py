@@ -88,17 +88,20 @@ def update_request_time():
         connection.close()
 
 def main():
-    last_request_time = get_last_request_time()
-    if not last_request_time or datetime.datetime.now() - last_request_time > EXPIRATION_TIME:
-        logging.info("Кэш устарел, обновление базы данных...")
-        videos = fetch_youtube_videos()
-        if videos:
-            save_videos_to_database(videos)
-            update_request_time()
+    while True:  # Бесконечный цикл
+        last_request_time = get_last_request_time()
+        if not last_request_time or datetime.datetime.now() - last_request_time > EXPIRATION_TIME:
+            logging.info("Кэш устарел, обновление базы данных...")
+            videos = fetch_youtube_videos()
+            if videos:
+                save_videos_to_database(videos)
+                update_request_time()
+            else:
+                logging.error("Не удалось получить видео с YouTube.")
         else:
-            logging.error("Не удалось получить видео с YouTube.")
-    else:
-        logging.info("Кэш актуален, обновление не требуется.")
+            logging.info("Кэш актуален, обновление не требуется.")
+
+        time.sleep(3600)  # Задержка в 1 час (3600 секунд)
 
 if __name__ == "__main__":
     main()
