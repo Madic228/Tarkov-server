@@ -1,0 +1,16 @@
+[0;1;32m●[0m uvicorn.service - Uvicorn server
+     Loaded: loaded (/etc/systemd/system/uvicorn.service; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Mon 2024-05-20 11:20:34 MSK; 8s ago
+   Main PID: 4463 (uvicorn)
+      Tasks: 5 (limit: 1012)
+     Memory: 68.0M
+        CPU: 1.115s
+     CGroup: /system.slice/uvicorn.service
+             ├─4463 /usr/bin/python3.11 /usr/local/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload --no-access-log
+             ├─4464 /usr/bin/python3.11 -c "from multiprocessing.resource_tracker import main;main(4)"
+             └─4465 /usr/bin/python3.11 -c "from multiprocessing.spawn import spawn_main; spawn_main(tracker_fd=5, pipe_handle=7)" --multiprocessing-fork
+
+May 20 11:20:34 2912615-nh31286.twc1.net systemd[1]: uvicorn.service: Deactivated successfully.
+May 20 11:20:34 2912615-nh31286.twc1.net systemd[1]: Stopped Uvicorn server.
+May 20 11:20:34 2912615-nh31286.twc1.net systemd[1]: uvicorn.service: Consumed 9.886s CPU time.
+May 20 11:20:34 2912615-nh31286.twc1.net systemd[1]: Started Uvicorn server.

@@ -1,5 +1,4 @@
 import time
-
 import mysql.connector
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -9,7 +8,6 @@ import logging
 # API ключ и ID канала
 API_KEY = "AIzaSyD8WMuLtNjdTHv9KwL4W3AdyhKb_AIjeKg"
 CHANNEL_ID = "UC5QGploHhl9_XaxDiHZKamg"
-
 
 # Время истечения кеша (24 часа)
 EXPIRATION_TIME = datetime.timedelta(hours=24)
@@ -25,9 +23,10 @@ def connect_to_database():
             password="admin",
             database="tarkov"
         )
+        logging.info("Успешное подключение к базе данных.")
         return connection
-    except Exception as e:
-        logging.error(f"Ошибка при подключении к базе данных: {str(e)}")
+    except mysql.connector.Error as err:
+        logging.error(f"Ошибка при подключении к базе данных: {err}")
         return None
 
 def get_last_request_time():
